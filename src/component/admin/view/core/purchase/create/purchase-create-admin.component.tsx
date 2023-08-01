@@ -1,17 +1,18 @@
-import { View, Text, StyleSheet, SafeAreaView, Modal, Keyboard } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, Keyboard } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import PurchaseAdminService from '../../../../../../controller/service/admin/PurchaseAdminService';
 import { ClientDto } from '../../../../../../controller/model/ClientDto';
-import { Picker } from '@react-native-picker/picker';
 import { Controller, useForm } from 'react-hook-form';
 import CustomInput from '../../../../../../zynerator/CustomInput';
 import CustomButton from '../../../../../../zynerator/CustomButton';
 import { ScrollView } from 'react-native-gesture-handler';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import { PurchaseDto } from '../../../../../../controller/model/PurchaseDto';
 import ClientAdminService from '../../../../../../controller/service/admin/ClientAdminService';
 import { AxiosResponse } from 'axios';
 import SaveFeedbackModal from '../../../../../../zynerator/SaveFeedbackModal';
+import { SelectList } from 'react-native-dropdown-select-list'
+
+
 
 
 const PurchaseAdminCreate = () => {
@@ -32,6 +33,11 @@ const PurchaseAdminCreate = () => {
     },
   });
 
+
+  const [selectedClient, setSelectedClient] = useState("");
+
+  const [data, setData] = useState([]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -39,6 +45,14 @@ const PurchaseAdminCreate = () => {
           ClientAdminService.getList(),
         ]);
         setClients(clientsResponse.data);
+
+        if (clientsResponse.data) {
+          let newArray = clientsResponse.data.map((item) => {
+            return { key: item.id, value: item.fullName }
+          })
+          setData(newArray)
+        }
+
       } catch (error) {
         console.error(error);
       }
@@ -47,6 +61,12 @@ const PurchaseAdminCreate = () => {
   }, []);
 
   const handleSave = async (item: PurchaseDto) => {
+
+
+    item.client = clients.find((client) => client.id == Number(selectedClient));
+
+    console.log(item.client)
+
     Keyboard.dismiss();
 
     try {
@@ -55,6 +75,7 @@ const PurchaseAdminCreate = () => {
       );
 
       reset();
+      setSelectedClient("")
 
       setShowSavedModal(true);
       setTimeout(() => setShowSavedModal(false), 1500);
@@ -67,6 +88,8 @@ const PurchaseAdminCreate = () => {
 
     }
   };
+
+
 
 
 
@@ -88,42 +111,21 @@ const PurchaseAdminCreate = () => {
         <CustomInput control={control} name={'total'} placeholder={'Total'} keyboardT="numeric" />
         <CustomInput control={control} name={'description'} placeholder={'Description'} keyboardT="default" />
 
-        <Controller
-          control={control}
-          rules={{ required: 'Please select a client' }}
-          render={({ field, fieldState: { error } }) => (
-            <>
+        <View style={styles.container}>
 
-              <View
+          <SelectList
+            setSelected={setSelectedClient}
+            data={data}
+            boxStyles={{ borderRadius: 5, borderColor: '#e8e8e8' }}
+            dropdownStyles={{ borderColor: '#f5f5f5' }}
+            dropdownItemStyles={{ backgroundColor: 'rgba(220,220,220,0.3)', margin: 1, borderRadius: 5 }}
+          />
+         
+        </View>
 
-                style={
-                  [
-                    styles.container,
-                    { borderColor: error ? 'red' : '#e8e8e8' },
-                  ]}
 
-              >
-                <Picker
-                  selectedValue={field.value}
-                  onValueChange={field.onChange}
 
-                >
-                  <Picker.Item label="Select a client" value={undefined} />
-                  {clients.map((client) => (
-                    <Picker.Item key={client.id} label={client.fullName} value={client.id} />
-                  ))}
-                </Picker>
 
-              </View>
-              {error && (
-                <Text style={{ color: 'red', alignSelf: 'stretch' }}>
-                  {'Required'}
-                </Text>
-              )}
-            </>
-          )}
-          name="client.id"
-        />
 
         <CustomButton
           onPress={handleSubmit(handleSave)}

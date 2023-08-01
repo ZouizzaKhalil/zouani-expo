@@ -43,7 +43,7 @@ const PurchaseAdminList: React.FC = () => {
   const fetchData = async () => {
     try {
       const [clientsResponse] = await Promise.all<PurchaseResponse>([
-      PurchaseAdminService.getList(),
+        PurchaseAdminService.getList(),
       ]);
       setPurchases(clientsResponse.data);
     } catch (error) {
@@ -73,18 +73,23 @@ const PurchaseAdminList: React.FC = () => {
       >Purchase List</Text>
 
       <View style={{ marginBottom: 100 }}>
-        {purchases.map((purchase) => (
-          <PurchaseCard
-            key={purchase.id}
-            reference={purchase.reference}
-            description={purchase.description}
-            ClientName={purchase.client.fullName}
-            total={purchase.total}
-            onPressDelete={() => handleDeletePress(purchase.id)}
-            onUpdate={() => handleUpdate(purchase)}
-          />
-        ))}
+        {purchases && purchases.length > 0 ? (
+          purchases.map((purchase) => (
+            <PurchaseCard
+              key={purchase.id}
+              reference={purchase.reference}
+              description={purchase.description}
+              ClientName={purchase.client.fullName}
+              total={purchase.total}
+              onPressDelete={() => handleDeletePress(purchase.id)}
+              onUpdate={() => handleUpdate(purchase)}
+            />
+          ))
+        ) : (
+          <Text style={{fontSize: 20, textAlign: 'center', color: 'red', marginTop: 20}}>No purchases found.</Text>
+        )}
       </View>
+
 
       <ConfirmDeleteModal
         isVisible={isDeleteModalVisible}

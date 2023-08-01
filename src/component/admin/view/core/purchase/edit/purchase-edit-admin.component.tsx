@@ -13,6 +13,8 @@ import { ScrollView, TextInput } from 'react-native-gesture-handler';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { AxiosResponse } from 'axios';
 import SaveFeedbackModal from '../../../../../../zynerator/SaveFeedbackModal';
+import { SelectList } from 'react-native-dropdown-select-list'
+
 
 
 
@@ -44,6 +46,10 @@ const PurchaseAdminEdit: React.FC<Props> = ({ route }) => {
         },
     });
 
+    const [selectedClient, setSelectedClient] = useState("");
+
+    const [data, setData] = useState([]);
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -51,6 +57,14 @@ const PurchaseAdminEdit: React.FC<Props> = ({ route }) => {
                     ClientAdminService.getList(),
                 ]);
                 setClients(clientsResponse.data);
+
+                if (clientsResponse.data) {
+                    let newArray = clientsResponse.data.map((item) => {
+                        return { key: item.id, value: item.fullName }
+                    })
+                    setData(newArray)
+                }
+
             } catch (error) {
                 console.error(error);
             }
@@ -59,13 +73,17 @@ const PurchaseAdminEdit: React.FC<Props> = ({ route }) => {
     }, []);
 
 
-    const handleUpdate = async (data: PurchaseDto) => {
+    const handleUpdate = async (item: PurchaseDto) => {
+
+        item.client = clients.find((client) => client.id == Number(selectedClient));
+
+
         Keyboard.dismiss();
-        console.log('Data to be updated:', data);
+        console.log('Data to be updated:', item);
 
         try {
 
-            await PurchaseAdminService.update(data);
+            await PurchaseAdminService.update(item);
             navigation.navigate('Purchase');
         } catch (error) {
             console.error('Error saving purchase:', error);
@@ -98,41 +116,28 @@ const PurchaseAdminEdit: React.FC<Props> = ({ route }) => {
 
                 <CustomInput control={control} name={'description'} placeholder={'description'} keyboardT="default" />
 
-                <Controller
-                    control={control}
-                    rules={{ required: 'Please select a client' }}
-                    render={({ field, fieldState: { error } }) => (
-                        <>
 
-                            <View
+                <View style={{
+                    backgroundColor: 'white', width: '100%', marginTop: 15, borderRadius: 7
 
-                                style={
-                                    [
-                                        styles.container,
-                                        { borderColor: error ? 'red' : '#e8e8e8' },
-                                    ]}
+                }}>
+                    <SelectList
+                        setSelected={setSelectedClient}
+                        data={data}
+                        defaultOption={{ key: purchase.client.id, value: purchase.client.fullName }}
+                        boxStyles={{
+                            backgroundColor: 'white',
+                            width: '100%',
+                            borderColor: '#e8e8e8',
+                            borderWidth: 1,
+                            borderRadius: 7,
+                            paddingHorizontal: 15,
+                        }}
+                        dropdownStyles={{ borderColor: 'white' }}
+                        dropdownItemStyles={{ backgroundColor: 'rgba(220,220,220,0.3)', margin: 1, borderRadius: 5 }}
+                    />
+                </View>
 
-                            >
-                                <Picker
-                                    selectedValue={field.value}
-                                    onValueChange={field.onChange}
-                                >
-                                    <Picker.Item label="Select a client" value={undefined} />
-                                    {clients.map((client) => (
-                                        <Picker.Item key={client.id} label={client.fullName} value={client.id} />
-                                    ))}
-                                </Picker>
-
-                            </View>
-                            {error && (
-                                <Text style={{ color: 'red', alignSelf: 'stretch' }}>
-                                    {'Required'}
-                                </Text>
-                            )}
-                        </>
-                    )}
-                    name="client.id"
-                />
 
                 <CustomButton
                     onPress={handleSubmit(handleUpdate)}
