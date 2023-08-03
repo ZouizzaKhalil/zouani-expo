@@ -1,72 +1,19 @@
 import { View, Text, SafeAreaView, PanResponder, StyleSheet } from 'react-native';
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { LinearGradient } from 'expo-linear-gradient';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 
 
 const PurchaseCard = ({ reference, description, ClientName, total, onPressDelete, onUpdate }) => {
 
-    const [positionX, setPositionX] = useState(0);
-    const [deleteOpacity, setDeleteOpacity] = useState(1);
-    const [panEnabled, setPanEnabled] = useState(true);
-
-
-
-    const panResponder = useRef(
-        PanResponder.create({
-
-            onStartShouldSetPanResponder: () => panEnabled,
-            onPanResponderMove: (_, gestureState) => {
-                const swipeThreshold = 50;
-
-                if (gestureState.dx > swipeThreshold) {
-                    setPositionX(gestureState.dx);
-
-                } else if (gestureState.dx < -swipeThreshold) {
-                    setPositionX(gestureState.dx);
-                    setDeleteOpacity(0.5);
-                } else {
-                    setPositionX(0);
-                    setDeleteOpacity(1);
-
-                }
-            },
-            onPanResponderEnd: (_, gestureState) => {
-                const swipeThreshold = 50;
-
-                if (gestureState.dx > swipeThreshold) {
-                    onUpdate();
-                } else if (gestureState.dx < -swipeThreshold) {
-                    onPressDelete()
-                    setDeleteOpacity(1);
-
-                } else {
-                    //console.log('No swipe');
-
-                }
-                setPositionX(0);
-            },
-        })
-    ).current;
 
     return (
         <SafeAreaView>
 
-            <View style={{ flexDirection: 'row', alignItems: 'center', alignContent: 'center', alignSelf:'center' }}>
+            <View style={{ flexDirection: 'row', width: '100%' }}>
 
-                <Text style={{
-                    position: 'absolute',
-                    right: 0,
-                    opacity: positionX < 0 ? 1 : 0,
-                    transform: [{ rotate: '-90deg' }],
-                    fontSize: 30,
-                    fontWeight: 'bold',
-                    color: 'red'
-
-                }}>
-                    Delete
-                </Text>
 
                 <LinearGradient colors={['#ffa343', '#c0c0c0']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
                     style={{
@@ -76,13 +23,10 @@ const PurchaseCard = ({ reference, description, ClientName, total, onPressDelete
                         marginVertical: 10,
                         elevation: 13,
                         backgroundColor: 'white',
-                        width: '100%',
+                        width: '95%',
                         flexDirection: 'row',
-                        //marginRight: '25%',
-                        transform: [{ translateX: positionX }],
-                        opacity: deleteOpacity
+                        justifyContent: 'space-between'
                     }}
-                    {...panResponder.panHandlers}
                 >
 
 
@@ -112,35 +56,26 @@ const PurchaseCard = ({ reference, description, ClientName, total, onPressDelete
 
                     </View>
 
-                    {/*
-                <View style={{ alignItems: 'center', position: 'absolute', right: '-10%', top: 9 }}>
 
-                    <TouchableOpacity onPress={() => onUpdate()} style={styles.updateButton}>
-                        <Text style={{ color: 'white', fontWeight: 'bold' }}>Update</Text>
-                    </TouchableOpacity>
+                    <View style={{ alignItems: 'center' , flexDirection: 'column', justifyContent: 'space-between'}}>
 
-                    <TouchableOpacity onPress={() => onPressDelete()} style={styles.deleteButton}>
-                        <Text style={{ color: 'white', fontWeight: 'bold' }}>Delete</Text>
-                    </TouchableOpacity>
+                        <TouchableOpacity onPress={() => onPressDelete()} style={styles.deleteButton}>
+                            <Ionicons name="trash-outline" size={25} color={'red'} />
+                        </TouchableOpacity>
 
-                </View>
-                */}
+                        <TouchableOpacity onPress={() => onUpdate()} style={styles.updateButton}>
+                            <Text style={{ color: 'white', fontWeight: 'bold' }}>Update</Text>
+                        </TouchableOpacity>
+
+
+
+                    </View>
+
 
                 </LinearGradient>
 
 
-                <Text style={{
-                    position: 'absolute',
-                    left: -10,
-                    opacity: positionX > 0 ? 1 : 0,
-                    transform: [{ rotate: '-90deg' }],
-                    fontSize: 30,
-                    fontWeight: 'bold',
-                    color: 'blue'
 
-                }}>
-                    Update
-                </Text>
             </View>
 
 
@@ -161,24 +96,18 @@ const styles = StyleSheet.create({
         marginRight: '25%',
     },
     deleteButton: {
-        backgroundColor: 'rgba(255,40,0, 0.9)',
-        borderRadius: 60,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginHorizontal: 7,
-        width: 70,
-        height: 70,
-        marginVertical: 3
+        marginLeft: 40,
+        marginTop: 10
+        
     },
     updateButton: {
         backgroundColor: 'rgba(0,0,255,0.9)',
-        borderRadius: 60,
+        borderRadius: 5,
         justifyContent: 'center',
         alignItems: 'center',
-        marginHorizontal: 7,
-        width: 70,
-        height: 70,
-        marginVertical: 3
+        marginHorizontal: 10,
+        marginVertical: 10,
+        padding: 10,
     },
     buttons: {
         position: 'absolute',

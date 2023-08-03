@@ -57,9 +57,23 @@ const PurchaseAdminList: React.FC = () => {
     }, [])
   );
 
-  const handleUpdate = (purchase: PurchaseDto) => {
-    navigation.navigate('PurchaseUpdate', { purchase });
+
+  const handleFetchAndUpdate = async (id: number) => {
+    try {
+      const purchaseResponse = await PurchaseAdminService.findById(id);
+      const purchaseData = purchaseResponse.data;
+      navigation.navigate('PurchaseUpdate', { purchase: purchaseData });
+    } catch (error) {
+      console.error('Error fetching purchase data:', error);
+    }
   };
+
+  /*
+    const handleUpdate = (purchase: PurchaseDto) => {
+      navigation.navigate('PurchaseUpdate', { purchase });
+    };
+  */
+
 
   return (
     <ScrollView showsVerticalScrollIndicator={false} style={{ paddingHorizontal: 10, backgroundColor: '#e6e8fa' }}>
@@ -82,11 +96,11 @@ const PurchaseAdminList: React.FC = () => {
               ClientName={purchase.client.fullName}
               total={purchase.total}
               onPressDelete={() => handleDeletePress(purchase.id)}
-              onUpdate={() => handleUpdate(purchase)}
+              onUpdate={() => handleFetchAndUpdate(purchase.id)}
             />
           ))
         ) : (
-          <Text style={{fontSize: 20, textAlign: 'center', color: 'red', marginTop: 20}}>No purchases found.</Text>
+          <Text style={{ fontSize: 20, textAlign: 'center', color: 'red', marginTop: 20 }}>No purchases found.</Text>
         )}
       </View>
 

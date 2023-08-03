@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, SafeAreaView, Modal, Keyboard } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Keyboard } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { RouteProp } from '@react-navigation/native';
 import { PurchaseDto } from '../../../../../../controller/model/PurchaseDto';
@@ -13,9 +13,8 @@ import { ScrollView, TextInput } from 'react-native-gesture-handler';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { AxiosResponse } from 'axios';
 import SaveFeedbackModal from '../../../../../../zynerator/SaveFeedbackModal';
-import { SelectList } from 'react-native-dropdown-select-list'
-
-
+import FilterModal from '../../../../../../zynerator/FilterModal';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 
 type PurchaseUpdateScreenRouteProp = RouteProp<{ PurchaseUpdate: { purchase: PurchaseDto } }, 'PurchaseUpdate'>;
@@ -29,11 +28,16 @@ const PurchaseAdminEdit: React.FC<Props> = ({ route }) => {
 
     const navigation = useNavigation<NavigationProp<any>>();
     type ClientResponse = AxiosResponse<ClientDto[]>;
-
     const { purchase } = route.params;
 
     const [clients, setClients] = useState<ClientDto[]>([]);
     const [showErrorModal, setShowErrorModal] = useState(false);
+    const [clientModalVisible, setCLientModalVisible] = useState(false);
+    const [selectedClient, setSelectedClient] = useState<ClientDto>({
+        id: purchase.client.id,
+        fullName: purchase.client.fullName,
+        email: purchase.client.email
+    });
 
 
     const { control, handleSubmit } = useForm<PurchaseDto>({
@@ -46,9 +50,17 @@ const PurchaseAdminEdit: React.FC<Props> = ({ route }) => {
         },
     });
 
-    const [selectedClient, setSelectedClient] = useState("");
 
-    const [data, setData] = useState([]);
+    const onClientSelect = (item) => {
+        console.log('Selected Item:', item);
+        setSelectedClient(item);
+        setCLientModalVisible(false);
+    };
+
+    const handleCloseModal = () => {
+        setCLientModalVisible(false);
+    };
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -57,14 +69,6 @@ const PurchaseAdminEdit: React.FC<Props> = ({ route }) => {
                     ClientAdminService.getList(),
                 ]);
                 setClients(clientsResponse.data);
-
-                if (clientsResponse.data) {
-                    let newArray = clientsResponse.data.map((item) => {
-                        return { key: item.id, value: item.fullName }
-                    })
-                    setData(newArray)
-                }
-
             } catch (error) {
                 console.error(error);
             }
@@ -75,9 +79,7 @@ const PurchaseAdminEdit: React.FC<Props> = ({ route }) => {
 
     const handleUpdate = async (item: PurchaseDto) => {
 
-        item.client = clients.find((client) => client.id == Number(selectedClient));
-
-
+        item.client = selectedClient;
         Keyboard.dismiss();
         console.log('Data to be updated:', item);
 
@@ -117,26 +119,17 @@ const PurchaseAdminEdit: React.FC<Props> = ({ route }) => {
                 <CustomInput control={control} name={'description'} placeholder={'description'} keyboardT="default" />
 
 
-                <View style={{
-                    backgroundColor: 'white', width: '100%', marginTop: 15, borderRadius: 7
-
-                }}>
-                    <SelectList
-                        setSelected={setSelectedClient}
-                        data={data}
-                        defaultOption={{ key: purchase.client.id, value: purchase.client.fullName }}
-                        boxStyles={{
-                            backgroundColor: 'white',
-                            width: '100%',
-                            borderColor: '#e8e8e8',
-                            borderWidth: 1,
-                            borderRadius: 7,
-                            paddingHorizontal: 15,
-                        }}
-                        dropdownStyles={{ borderColor: 'white' }}
-                        dropdownItemStyles={{ backgroundColor: 'rgba(220,220,220,0.3)', margin: 1, borderRadius: 5 }}
-                    />
-                </View>
+                
+                    <TouchableOpacity onPress={() => setCLientModalVisible(true)}
+                        style={styles.placeHolder}
+                    >
+                        <View style={{
+                            flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
+                        }}>
+                            <Text>{selectedClient.fullName}</Text>
+                            <Ionicons name="caret-down-outline" size={22} color={'black'} />
+                        </View>
+                    </TouchableOpacity>
 
 
                 <CustomButton
@@ -156,6 +149,14 @@ const PurchaseAdminEdit: React.FC<Props> = ({ route }) => {
             />
 
 
+            <FilterModal
+                visibility={clientModalVisible}
+                placeholder={"Select a Client"}
+                onItemSelect={onClientSelect}
+                items={clients}
+                onClose={handleCloseModal}
+                variable={'fullName'}
+            />
 
         </SafeAreaView>
     )
@@ -194,6 +195,17 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
     },
+    placeHolder: {
+        backgroundColor: '#f5f5f5',
+        width: '100%',
+        borderColor: '#e8e8e8',
+        borderWidth: 1,
+        borderRadius: 7,
+        paddingHorizontal: 15,
+        padding: 15,
+        marginTop: 15,
+        marginBottom: 10,
+    }
 });
 
 export default PurchaseAdminEdit

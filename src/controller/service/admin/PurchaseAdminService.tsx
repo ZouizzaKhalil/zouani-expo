@@ -20,7 +20,10 @@ const deleteById = async (id: number): Promise<AxiosResponse<PurchaseDto[]>> => 
   return axios.delete(ADMIN_URL + 'purchase/id/' + id);
 }
 
+const findById = async (id: number): Promise<AxiosResponse<PurchaseDto>> => {
+  return axios.get(ADMIN_URL + 'purchase/id/' + id);
+}
 
 
 
-export default { save, deleteById, update, getList };
+export default { save, deleteById, update, getList, findById };
