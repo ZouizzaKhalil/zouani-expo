@@ -1,21 +1,20 @@
-import { View, Text, SafeAreaView, PanResponder, StyleSheet } from 'react-native';
+import { View, Text, SafeAreaView, PanResponder, StyleSheet, TouchableOpacity } from 'react-native';
 import React from 'react';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 
 
-const PurchaseCard = ({ reference, description, ClientName, total, onPressDelete, onUpdate }) => {
+const PurchaseCard = ({ reference, description, ClientName, total, onPressDelete, onUpdate, onDetails }) => {
 
 
     return (
         <SafeAreaView>
-
-            <View style={{ flexDirection: 'row', width: '100%' }}>
-
-
-                <LinearGradient colors={['#ffa343', '#c0c0c0']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+            <View
+                style={{ flexDirection: 'row', width: '100%' }}
+            >
+                <TouchableOpacity
+                    onPress={onDetails}
                     style={{
                         height: 170,
                         marginHorizontal: 10,
@@ -28,6 +27,7 @@ const PurchaseCard = ({ reference, description, ClientName, total, onPressDelete
                         justifyContent: 'space-between'
                     }}
                 >
+
 
 
                     <View style={{ marginLeft: 15, marginVertical: 10 }}>
@@ -51,14 +51,10 @@ const PurchaseCard = ({ reference, description, ClientName, total, onPressDelete
                             <Text style={{ fontSize: 18, fontWeight: 'bold' }}>- Client: </Text>
                             <Text style={{ fontSize: 14, fontWeight: 'bold' }}>{ClientName}</Text>
                         </View>
-
-
-
                     </View>
 
 
-                    <View style={{ alignItems: 'center' , flexDirection: 'column', justifyContent: 'space-between'}}>
-
+                    <View style={{ alignItems: 'center', flexDirection: 'column', justifyContent: 'space-between' }}>
                         <TouchableOpacity onPress={() => onPressDelete()} style={styles.deleteButton}>
                             <Ionicons name="trash-outline" size={25} color={'red'} />
                         </TouchableOpacity>
@@ -66,18 +62,14 @@ const PurchaseCard = ({ reference, description, ClientName, total, onPressDelete
                         <TouchableOpacity onPress={() => onUpdate()} style={styles.updateButton}>
                             <Text style={{ color: 'white', fontWeight: 'bold' }}>Update</Text>
                         </TouchableOpacity>
-
-
-
                     </View>
 
 
-                </LinearGradient>
+                </TouchableOpacity>
 
 
 
             </View>
-
 
         </SafeAreaView>
     );
@@ -98,7 +90,7 @@ const styles = StyleSheet.create({
     deleteButton: {
         marginLeft: 40,
         marginTop: 10
-        
+
     },
     updateButton: {
         backgroundColor: 'rgba(0,0,255,0.9)',

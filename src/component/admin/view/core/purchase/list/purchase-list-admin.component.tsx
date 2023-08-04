@@ -68,6 +68,16 @@ const PurchaseAdminList: React.FC = () => {
     }
   };
 
+  const handleFetchAndDetails = async (id: number) => {
+    try {
+      const purchaseResponse = await PurchaseAdminService.findById(id);
+      const purchaseData = purchaseResponse.data;
+      navigation.navigate('PurchaseDetails', { purchase: purchaseData });
+    } catch (error) {
+      console.error('Error fetching purchase data:', error);
+    }
+  };
+
   /*
     const handleUpdate = (purchase: PurchaseDto) => {
       navigation.navigate('PurchaseUpdate', { purchase });
@@ -97,6 +107,7 @@ const PurchaseAdminList: React.FC = () => {
               total={purchase.total}
               onPressDelete={() => handleDeletePress(purchase.id)}
               onUpdate={() => handleFetchAndUpdate(purchase.id)}
+              onDetails={() => handleFetchAndDetails(purchase.id)}
             />
           ))
         ) : (
