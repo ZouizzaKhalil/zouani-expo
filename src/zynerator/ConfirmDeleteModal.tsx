@@ -21,7 +21,7 @@ const ConfirmDeleteModal = ({ isVisible, handleConfirmDelete, handleCancelDelete
                         alignItems: 'center',
                     }}>
                     <View style={{ flexDirection: 'row' }}>
-                        <Ionicons name="warning-outline" size={22} color={'#fcc200'}/>
+                        <Ionicons name="warning-outline" size={22} color={'#fcc200'} />
 
                         <Text style={{ fontWeight: 'bold', fontSize: 18, marginHorizontal: 5 }}>
                             Confirm delete!

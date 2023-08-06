@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, TextInput, Modal, TouchableOpacity, Text, ScrollView , StyleSheet} from 'react-native';
+import { View, TextInput, Modal, TouchableOpacity, Text, ScrollView, StyleSheet } from 'react-native';
 
 const FilterModal = ({ items, placeholder, onItemSelect, visibility, onClose, variable }) => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -72,7 +72,7 @@ const FilterModal = ({ items, placeholder, onItemSelect, visibility, onClose, va
                                     }}
                                     style={styles.item}
                                 >
-                                    <Text style={{fontWeight: 'bold', fontSize: 15}}>{item[variable]}</Text>
+                                    <Text style={{ fontWeight: 'bold', fontSize: 15 }}>{item[variable]}</Text>
                                 </TouchableOpacity>
                             ))}
                         </ScrollView>

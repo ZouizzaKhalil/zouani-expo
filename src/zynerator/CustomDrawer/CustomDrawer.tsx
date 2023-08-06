@@ -40,7 +40,7 @@ const CustomDrawer = props => {
                     <View style={{ marginTop: 130, marginLeft: 20 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
 
-                            <View style={{marginTop: 7, marginRight: 5}}>
+                            <View style={{ marginTop: 7, marginRight: 5 }}>
                                 <Ionicons name="cash-sharp" size={22} color={'white'} />
                             </View>
                             <Text

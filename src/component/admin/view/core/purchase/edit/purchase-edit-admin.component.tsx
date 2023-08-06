@@ -5,8 +5,7 @@ import { PurchaseDto } from '../../../../../../controller/model/PurchaseDto';
 import ClientAdminService from '../../../../../../controller/service/admin/ClientAdminService';
 import PurchaseAdminService from '../../../../../../controller/service/admin/PurchaseAdminService';
 import { ClientDto } from '../../../../../../controller/model/ClientDto';
-import { Picker } from '@react-native-picker/picker';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import CustomInput from '../../../../../../zynerator/CustomInput';
 import CustomButton from '../../../../../../zynerator/CustomButton';
 import { ScrollView, TextInput } from 'react-native-gesture-handler';
@@ -96,9 +95,6 @@ const PurchaseAdminEdit: React.FC<Props> = ({ route }) => {
 
 
 
-
-
-
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#e6e8fa' }}>
             <ScrollView style={{ margin: 20 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
@@ -111,25 +107,20 @@ const PurchaseAdminEdit: React.FC<Props> = ({ route }) => {
                 }}
                 >Update Purchase</Text>
 
-
                 <CustomInput control={control} name={'reference'} placeholder={'reference'} keyboardT="default" />
-
                 <CustomInput control={control} name={'total'} placeholder={'total'} keyboardT="numeric" />
-
                 <CustomInput control={control} name={'description'} placeholder={'description'} keyboardT="default" />
 
-
-                
-                    <TouchableOpacity onPress={() => setCLientModalVisible(true)}
-                        style={styles.placeHolder}
-                    >
-                        <View style={{
-                            flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
-                        }}>
-                            <Text>{selectedClient.fullName}</Text>
-                            <Ionicons name="caret-down-outline" size={22} color={'black'} />
-                        </View>
-                    </TouchableOpacity>
+                <TouchableOpacity onPress={() => setCLientModalVisible(true)}
+                    style={styles.placeHolder}
+                >
+                    <View style={{
+                        flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
+                    }}>
+                        <Text>{selectedClient.fullName}</Text>
+                        <Ionicons name="caret-down-outline" size={22} color={'black'} />
+                    </View>
+                </TouchableOpacity>
 
 
                 <CustomButton

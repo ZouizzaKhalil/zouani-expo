@@ -32,6 +32,9 @@ const PurchaseAdminCreate = () => {
   const [isPurchaseCollapsed, setIsPurchaseCollapsed] = useState(true);
   const [isItemCollapsed, setIsItemCollapsed] = useState(true);
   const [isItemsCollapsed, setIsItemsCollapsed] = useState(true);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editIndex, setEditIndex] = useState(null);
+
 
   type ClientResponse = AxiosResponse<ClientDto[]>;
   type ProductResponse = AxiosResponse<ProductDto[]>;
@@ -45,12 +48,11 @@ const PurchaseAdminCreate = () => {
     },
   });
 
-  const { control: control2, handleSubmit: handleSubmit2, reset: reset2 } = useForm<PurchaseItemDto>({
+  const { control: itemControl, handleSubmit: handleItemSubmit, reset: resetItem } = useForm<PurchaseItemDto>({
     defaultValues: {
       price: null,
       quantity: null,
       product: undefined,
-      purchase: undefined
     },
   });
 
@@ -93,35 +95,26 @@ const PurchaseAdminCreate = () => {
 
 
   useEffect(() => {
-    const fetchClientsData = async () => {
+    const fetchData = async () => {
       try {
-        const [clientsResponse] = await Promise.all<ClientResponse>([
+        const [clientsResponse, productsResponse] = await Promise.all([
           ClientAdminService.getList(),
-        ]);
-        setClients(clientsResponse.data);
-
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchClientsData();
-  }, []);
-
-
-  useEffect(() => {
-    const fetchProductsData = async () => {
-      try {
-        const [productResponse] = await Promise.all<ProductResponse>([
           ProductAdminService.getList(),
         ]);
-        setProducts(productResponse.data);
 
+        const clientsData = (clientsResponse as ClientResponse).data;
+        const productsData = (productsResponse as ProductResponse).data;
+
+        setClients(clientsData);
+        setProducts(productsData);
       } catch (error) {
         console.error(error);
       }
     };
-    fetchProductsData();
+
+    fetchData();
   }, []);
+
 
 
   const handleAddPurchaseItem = (data: PurchaseItemDto) => {
@@ -133,7 +126,10 @@ const PurchaseAdminCreate = () => {
         purchase: undefined
       };
       setPurchaseItems((prevItems) => [...prevItems, newPurchaseItem]);
-      reset2();
+      resetItem({
+        price: null,
+        quantity: null,
+      });
       setSelectedProduct({ code: '', reference: 'Select a Product' });
     }
   };
@@ -142,6 +138,30 @@ const PurchaseAdminCreate = () => {
     const updatedItems = purchaseItems.filter((item, i) => i !== index);
     setPurchaseItems(updatedItems);
   };
+
+
+  const handleUpdateItem = (data: PurchaseItemDto) => {
+
+    if (data) {
+      purchaseItems.map((item, i) => {
+        if (i === editIndex) {
+          item.price = data.price;
+          item.quantity = data.quantity;
+          item.product = selectedProduct;
+        }
+      });
+
+      resetItem({
+        price: null,
+        quantity: null,
+      });
+      setSelectedProduct({ code: '', reference: 'Select a Product' });
+      setIsEditMode(false);
+    }
+
+    setIsItemsCollapsed(!isItemsCollapsed);
+    setIsItemCollapsed(!isItemCollapsed);
+  }
 
 
   const handleSave = async (item: PurchaseDto) => {
@@ -155,6 +175,7 @@ const PurchaseAdminCreate = () => {
         item
       );
 
+      setIsItemsCollapsed(!isItemsCollapsed);
       reset();
       setSelectedClient({ id: null, fullName: 'Select a Client', email: '' });
       setShowSavedModal(true);
@@ -168,6 +189,29 @@ const PurchaseAdminCreate = () => {
 
     }
   };
+
+  const updateFormDefaultValues = (index: number) => {
+    let updatedPurchase: PurchaseItemDto;
+    setEditIndex(index);
+    setIsEditMode(true);
+    purchaseItems.map((item, i) => {
+      if (i === index) {
+        updatedPurchase = item;
+      }
+    });
+
+    resetItem({
+      price: updatedPurchase.price,
+      quantity: updatedPurchase.quantity,
+    });
+    setSelectedProduct(updatedPurchase.product);
+    setIsItemsCollapsed(!isItemsCollapsed);
+    setIsItemCollapsed(!isItemCollapsed);
+  };
+
+
+
+
 
 
 
@@ -245,10 +289,17 @@ const PurchaseAdminCreate = () => {
             </View>
           </TouchableOpacity>
 
-          <CustomInput control={control2} name={'price'} placeholder={'price'} keyboardT="numeric" />
-          <CustomInput control={control2} name={'quantity'} placeholder={'quantity'} keyboardT="numeric" />
+          <CustomInput control={itemControl} name={'price'} placeholder={'price'} keyboardT="numeric" />
+          <CustomInput control={itemControl} name={'quantity'} placeholder={'quantity'} keyboardT="numeric" />
 
-          <TouchableOpacity onPress={handleSubmit2(handleAddPurchaseItem)}
+          <TouchableOpacity
+            onPress={
+              isEditMode
+                ? handleItemSubmit((data) => {
+                  handleUpdateItem(data);
+                })
+                : handleItemSubmit(handleAddPurchaseItem)
+            }
             style={{
               backgroundColor: '#32cd32',
               borderRadius: 10,
@@ -257,9 +308,19 @@ const PurchaseAdminCreate = () => {
               paddingVertical: 10,
               marginLeft: '80%',
               marginTop: 10
-            }}>
-            <Text style={{ textAlign: 'center', fontWeight: 'bold', fontSize: 20 }}>+</Text>
+            }}
+          >
+            <Text style={{ textAlign: 'center', fontWeight: 'bold', fontSize: 20 }}>
+              {isEditMode ?
+                <Ionicons name="pencil-outline" size={25} color={'blue'} />
+                : '+'
+              }
+            </Text>
           </TouchableOpacity>
+
+
+
+
 
         </Collapsible>
 
@@ -285,9 +346,15 @@ const PurchaseAdminCreate = () => {
                   <Text style={styles.infos}>Quantity: {item.quantity}</Text>
                 </View>
 
-                <TouchableOpacity onPress={() => handleDeleteItem(index)}>
-                  <Ionicons name="trash-outline" size={22} color={'red'} />
-                </TouchableOpacity>
+                <View style={{ alignItems: 'center', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <TouchableOpacity onPress={() => handleDeleteItem(index)}>
+                    <Ionicons name="trash-outline" size={22} color={'red'} />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity onPress={() => updateFormDefaultValues(index)}>
+                    <Ionicons name="pencil-outline" size={22} color={'blue'} />
+                  </TouchableOpacity>
+                </View>
               </View>
             ))
           ) : (

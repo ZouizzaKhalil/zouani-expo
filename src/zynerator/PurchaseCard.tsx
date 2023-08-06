@@ -1,8 +1,6 @@
-import { View, Text, SafeAreaView, PanResponder, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, SafeAreaView, StyleSheet, TouchableOpacity } from 'react-native';
 import React from 'react';
-import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
 
 
 const PurchaseCard = ({ reference, description, ClientName, total, onPressDelete, onUpdate, onDetails }) => {
@@ -60,7 +58,7 @@ const PurchaseCard = ({ reference, description, ClientName, total, onPressDelete
                         </TouchableOpacity>
 
                         <TouchableOpacity onPress={() => onUpdate()} style={styles.updateButton}>
-                            <Text style={{ color: 'white', fontWeight: 'bold' }}>Update</Text>
+                            <Ionicons name="pencil-outline" size={25} color={'blue'} />
                         </TouchableOpacity>
                     </View>
 
@@ -88,18 +86,12 @@ const styles = StyleSheet.create({
         marginRight: '25%',
     },
     deleteButton: {
-        marginLeft: 40,
-        marginTop: 10
+        margin: 15
 
     },
     updateButton: {
-        backgroundColor: 'rgba(0,0,255,0.9)',
-        borderRadius: 5,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginHorizontal: 10,
-        marginVertical: 10,
-        padding: 10,
+        margin: 15
+
     },
     buttons: {
         position: 'absolute',

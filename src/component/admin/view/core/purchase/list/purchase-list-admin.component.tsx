@@ -1,5 +1,5 @@
 import { View, Text, ScrollView } from 'react-native';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import PurchaseCard from '../../../../../../zynerator/PurchaseCard';
 import PurchaseAdminService from '../../../../../../controller/service/admin/PurchaseAdminService';
 import { PurchaseDto } from '../../../../../../controller/model/PurchaseDto';
@@ -51,6 +51,7 @@ const PurchaseAdminList: React.FC = () => {
     }
   };
 
+
   useFocusEffect(
     useCallback(() => {
       fetchData();
@@ -78,11 +79,6 @@ const PurchaseAdminList: React.FC = () => {
     }
   };
 
-  /*
-    const handleUpdate = (purchase: PurchaseDto) => {
-      navigation.navigate('PurchaseUpdate', { purchase });
-    };
-  */
 
 
   return (
